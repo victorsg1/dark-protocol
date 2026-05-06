@@ -1096,6 +1096,15 @@
     z-index: 1;
   }
 
+  /* Transparent blocker — sits above iframe (z:1) to intercept YouTube watermark clicks */
+  .vsl-blocker {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: transparent;
+    cursor: pointer;
+  }
+
   /* Custom controls bar */
   .vsl-controls {
     position: absolute;
@@ -1511,6 +1520,9 @@ function closeNav() {
     <iframe id="vslIframe" src="" allowfullscreen
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
     </iframe>
+
+    <!-- Blocker: transparent layer above iframe to intercept YouTube logo/watermark clicks -->
+    <div class="vsl-blocker" onclick="vslTogglePlay()" oncontextmenu="return false"></div>
 
     <!-- Custom controls -->
     <div class="vsl-controls" id="vslControls">
