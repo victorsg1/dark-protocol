@@ -1171,20 +1171,21 @@
       Ejemplo: src="https://www.youtube.com/embed/TU_VIDEO_ID?rel=0&modestbranding=1"
       Si aún no tienes el link, deja el placeholder visual de abajo.
     -->
-    <iframe
-      src="https://www.youtube.com/embed/VIDEO_ID_AQUI?rel=0&modestbranding=1&color=white"
-      title="The Dark Protocol — Introduction Video"
-      allowfullscreen
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      style="display:none"
-      id="mainVideo">
-    </iframe>
     <div class="video-placeholder" id="videoPlaceholder" onclick="playVideo()">
       <div class="play-btn">
         <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </div>
       <p>Play Introduction</p>
     </div>
+    <iframe
+      src=""
+      data-src="https://www.youtube.com/embed/gHxVlrmRdW0?rel=0&modestbranding=1&color=white"
+      title="The Dark Protocol — Introduction Video"
+      allowfullscreen
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;border:none;"
+      id="mainVideo">
+    </iframe>
   </div>
 </section>
 
@@ -1192,12 +1193,9 @@
 function playVideo() {
   var iframe = document.getElementById('mainVideo');
   var placeholder = document.getElementById('videoPlaceholder');
-  var src = iframe.src;
-  if (src.indexOf('VIDEO_ID_AQUI') === -1) {
-    iframe.src = src + '&autoplay=1';
-    iframe.style.display = 'block';
-    placeholder.style.display = 'none';
-  }
+  iframe.src = iframe.getAttribute('data-src') + '&autoplay=1';
+  iframe.style.display = 'block';
+  placeholder.style.display = 'none';
 }
 </script>
 
