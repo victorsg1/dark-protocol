@@ -127,6 +127,7 @@
     top: 0; left: 0; right: 0; bottom: 0;
     background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A96E' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     opacity: 1;
+    pointer-events: none;
   }
 
   .hero-badge {
@@ -789,6 +790,104 @@
 
   .sticky-bar a:hover { background: var(--gold-light); }
 
+  /* ── NAVBAR ── */
+  .navbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+    background: rgba(10, 10, 10, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #1E1E1E;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 60px;
+    transition: background 0.3s;
+  }
+
+  .navbar-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .navbar-logo span {
+    color: #555;
+    font-weight: 400;
+  }
+
+  .navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .navbar-links a {
+    color: #999;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+
+  .navbar-links a:hover { color: var(--gold); }
+
+  .navbar-cta {
+    background: var(--gold) !important;
+    color: var(--dark) !important;
+    padding: 8px 20px;
+    font-weight: 700 !important;
+    font-size: 11px !important;
+    letter-spacing: 1.5px;
+    transition: background 0.2s !important;
+  }
+
+  .navbar-cta:hover { background: var(--gold-light) !important; }
+
+  .navbar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  @media (max-width: 768px) {
+    .navbar { padding: 0 20px; }
+    .navbar-toggle { display: block; }
+    .navbar-links {
+      display: none;
+      position: absolute;
+      top: 60px; left: 0; right: 0;
+      background: rgba(10,10,10,0.98);
+      border-bottom: 1px solid #1E1E1E;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 20px 24px;
+      gap: 20px;
+    }
+    .navbar-links.open { display: flex; }
+    .navbar-links a { font-size: 13px; }
+  }
+
+  /* offset para que las secciones no queden bajo la navbar al hacer scroll */
+  section[id], div[id="video"] {
+    scroll-margin-top: 70px;
+  }
+
+  /* hero con padding top para no quedar tapado por navbar */
+  .hero { padding-top: 120px; }
+
   /* ── VIDEO SECTION ── */
   .video-section {
     padding: 100px 24px;
@@ -1131,6 +1230,31 @@
 <body>
 
 <!-- ═══════════════════════════════════
+     NAVBAR
+═══════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="navbar-logo">THE DARK <span>PROTOCOL</span></div>
+  <button class="navbar-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+  <ul class="navbar-links" id="navLinks">
+    <li><a href="#video" onclick="closeNav()">The Video</a></li>
+    <li><a href="#system" onclick="closeNav()">The System</a></li>
+    <li><a href="#curriculum" onclick="closeNav()">Phases</a></li>
+    <li><a href="#testimonials" onclick="closeNav()">Reviews</a></li>
+    <li><a href="#pricing" onclick="closeNav()">Pricing</a></li>
+    <li><a href="https://thedarkprotocol.gumroad.com/l/iqsfl" class="navbar-cta" target="_blank" rel="noopener">Start — $9</a></li>
+  </ul>
+</nav>
+
+<script>
+function toggleNav() {
+  document.getElementById('navLinks').classList.toggle('open');
+}
+function closeNav() {
+  document.getElementById('navLinks').classList.remove('open');
+}
+</script>
+
+<!-- ═══════════════════════════════════
      HERO
 ═══════════════════════════════════ -->
 <section class="hero">
@@ -1159,7 +1283,7 @@
 <!-- ═══════════════════════════════════
      VIDEO VSL
 ═══════════════════════════════════ -->
-<section class="video-section">
+<section class="video-section" id="video">
   <p class="section-label">Watch First</p>
   <h2>Before You Decide — Watch This</h2>
   <p>
@@ -1246,7 +1370,7 @@ function playVideo() {
 <!-- ═══════════════════════════════════
      FEATURE VISUALS WITH IMAGES
 ═══════════════════════════════════ -->
-<section class="feature-visuals">
+<section class="feature-visuals" id="system">
   <p class="section-label">How It Works</p>
   <h2>A System. Not Just Theory.</h2>
 
@@ -1520,7 +1644,7 @@ function playVideo() {
 <!-- ═══════════════════════════════════
      TESTIMONIALS
 ═══════════════════════════════════ -->
-<section class="testimonials">
+<section class="testimonials" id="testimonials">
   <p class="section-label">Real Results</p>
   <h2>Men Who Ran the Protocol</h2>
   <p>What happens when you stop guessing and start operating with a system.</p>
