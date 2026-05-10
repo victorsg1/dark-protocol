@@ -1,0 +1,39 @@
+# The Dark Protocol - SEO Configuration
+# Generated: 2026-05-10
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /.git/
+Disallow: /.env
+Disallow: /node_modules/
+
+# Specific crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+# Sitemap location
+Sitemap: https://victorsg1.github.io/dark-protocol/sitemap.xml
+
+# Crawl delay (optional - 0 = no delay)
+Crawl-delay: 0
