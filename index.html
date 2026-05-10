@@ -1443,10 +1443,9 @@
     animation: glow 2.5s ease-in-out infinite;
   }
 
-  .pricing-card .price sup {
-    font-size: 32px;
-    vertical-align: top;
-    margin-right: 4px;
+  .pricing-card .price::before {
+    content: '';
+    /* Precio alineado perfectamente */
   }
 
   .pricing-card .price-note {
@@ -1770,7 +1769,7 @@ window.addEventListener('scroll', function() {
   </p>
 
   <div class="hero-mockup">
-    <img src="mockup.png" alt="Dark Psychology & Seduction — Book, Tablet and Phone — The Dark Protocol Course" width="560" height="480" loading="eager" fetchpriority="high">
+    <img src="https://victorsg1.github.io/dark-protocol/mockup.png" alt="Dark Psychology & Seduction — Book, Tablet and Phone — The Dark Protocol Course" width="560" height="480" loading="eager" fetchpriority="high">
   </div>
 
   <div class="hero-cta-group">
@@ -2095,7 +2094,7 @@ window.addEventListener('scroll', function() {
     <div class="pricing-card">
       <h3>Phase I Access</h3>
       <p style="color:var(--gray);font-size:14px;margin-bottom:0">The Iron Mindset</p>
-      <div class="price"><sup>$</sup>9</div>
+      <div class="price">$9</div>
       <p class="price-note">One-time · Instant access</p>
       <ul class="pricing-features">
         <li>Phase I Core Manual</li>
@@ -2113,7 +2112,7 @@ window.addEventListener('scroll', function() {
       <h3>Complete System</h3>
       <p style="color:var(--gray);font-size:14px;margin-bottom:0">All 6 Phases Unlocked</p>
       <p class="original">Value: $297+</p>
-      <div class="price"><sup>$</sup>97</div>
+      <div class="price">$97</div>
       <p class="price-note">One-time · Lifetime access</p>
       <ul class="pricing-features">
         <li>All 6 Phase Core Manuals</li>
