@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <url>
+    <loc>https://victorsg1.github.io/dark-protocol/</loc>
+    <lastmod>2026-05-10T19:34:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://victorsg1.github.io/dark-protocol/mockup.png</image:loc>
+      <image:title>Dark Protocol - Book, Tablet &amp; Phone Mockup</image:title>
+      <image:caption>Premium product mockup showing The Dark Protocol course across multiple devices</image:caption>
+    </image:image>
+    <video:video>
+      <video:thumbnail_loc>https://img.youtube.com/vi/gHxVlrmRdW0/maxresdefault.jpg</video:thumbnail_loc>
+      <video:title>The Dark Protocol Video Breakdown</video:title>
+      <video:description>Before You Decide — Watch This breakdown of why most men stay stuck, and what The Dark Protocol changes.</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=gHxVlrmRdW0</video:content_loc>
+      <video:player_loc>https://www.youtube.com/embed/gHxVlrmRdW0</video:player_loc>
+      <video:duration>600</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+  </url>
+</urlset>
