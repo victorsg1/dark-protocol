@@ -2417,5 +2417,38 @@ function vslUpdateIcon() {
 }
 </script>
 
+
+<!-- Meta Pixel — Event Tracking: InitiateCheckout -->
+<script>
+(function () {
+  function trackCheckout(value, name, contentId) {
+    if (typeof fbq !== 'function') return;
+    fbq('track', 'InitiateCheckout', {
+      value: value,
+      currency: 'USD',
+      content_name: name,
+      content_ids: [contentId],
+      num_items: 1
+    });
+  }
+
+  // Event delegation — captures all clicks, works on all buttons and CTAs
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('a');
+    if (!el) return;
+    var href = el.getAttribute('href') || '';
+
+    // $9 — Phase I (Gumroad: iqsfl)
+    if (href.indexOf('gumroad.com/l/iqsfl') !== -1) {
+      trackCheckout(9.00, 'Dark Protocol — Phase I ($9)', 'DP-PHASE1-9');
+    }
+    // $97 — Complete System (Gumroad: sabryi)
+    else if (href.indexOf('gumroad.com/l/sabryi') !== -1) {
+      trackCheckout(97.00, 'Dark Protocol — Complete System ($97)', 'DP-COMPLETE-97');
+    }
+  }, true); // capture phase fires before navigation
+})();
+</script>
+<!-- End Meta Pixel Event Tracking -->
 </body>
 </html>
