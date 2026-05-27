@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're In — The Dark Protocol</title>
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --gold: #C9A96E;
+    --gold-light: #E8C98A;
+    --gold-dark: #9B7D4F;
+    --dark: #0A0A0A;
+    --dark-2: #111111;
+    --dark-3: #1A1A1A;
+    --dark-4: #222222;
+    --gray: #888888;
+    --gray-light: #AAAAAA;
+    --light: #F5F3EF;
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--dark);
+    color: var(--light);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  h1, h2, h3, h4 { font-family: 'Playfair Display', serif; line-height: 1.2; font-weight: 700; }
+  a { text-decoration: none; transition: all 0.3s ease; }
+
+  /* NAVBAR */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201,169,110,0.15);
+    padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 70px;
+  }
+  .navbar-logo { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; color: var(--white); letter-spacing: 2px; }
+  .navbar-logo .gold { color: var(--gold); }
+
+  /* PAGE */
+  .ty-page {
+    min-height: 100vh;
+    padding: 110px 20px 80px;
+    background: linear-gradient(135deg, #0d0f0a 0%, #0A0A0A 50%, #0D0D0D 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .ty-page::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 50% 30%, rgba(201,169,110,0.08) 0%, transparent 55%);
+    pointer-events: none;
+  }
+
+  .ty-container {
+    max-width: 680px;
+    margin: 0 auto;
+    position: relative; z-index: 1;
+    text-align: center;
+  }
+
+  /* CONFETTI / SUCCESS ICON */
+  .success-icon {
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, rgba(201,169,110,0.2), rgba(201,169,110,0.05));
+    border: 2px solid rgba(201,169,110,0.4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 32px;
+    animation: pulse-ring 2s ease-out;
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0; }
+    60% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .ty-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--dark);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+
+  .ty-title {
+    font-size: clamp(30px, 5vw, 48px);
+    color: var(--white);
+    margin-bottom: 14px;
+  }
+  .ty-title .gold { color: var(--gold); }
+
+  .ty-subtitle {
+    color: var(--gray-light);
+    font-size: 16px;
+    max-width: 480px;
+    margin: 0 auto 40px;
+  }
+
+  /* ACCESS CARD */
+  .access-card {
+    background: var(--dark-2);
+    border: 1px solid rgba(201,169,110,0.25);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 28px;
+    text-align: left;
+    position: relative;
+  }
+  .access-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .access-card-header {
+    background: linear-gradient(135deg, rgba(201,169,110,0.1), rgba(201,169,110,0.03));
+    border-bottom: 1px solid rgba(201,169,110,0.12);
+    padding: 22px 28px;
+  }
+  .access-plan-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .access-card-header h2 {
+    font-size: 22px;
+    color: var(--white);
+  }
+
+  .access-card-body { padding: 24px 28px; }
+
+  .access-steps { margin-bottom: 24px; }
+  .access-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .access-step:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--dark);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-content h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 3px;
+  }
+  .step-content p { font-size: 13px; color: var(--gray); line-height: 1.6; }
+  .step-content a { color: var(--gold); text-decoration: underline; }
+  .step-content a:hover { color: var(--gold-light); }
+
+  /* CTA BUTTONS */
+  .btn-gold {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--dark);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    padding: 16px 36px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    margin: 6px;
+  }
+  .btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(201,169,110,0.4);
+  }
+  .btn-outline {
+    display: inline-block;
+    border: 1px solid rgba(201,169,110,0.4);
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 14px 28px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    margin: 6px;
+  }
+  .btn-outline:hover {
+    background: rgba(201,169,110,0.08);
+    border-color: var(--gold);
+    transform: translateY(-1px);
+  }
+
+  /* ── UPGRADE BANNER (phase1 only) ── */
+  .upgrade-banner {
+    background: linear-gradient(135deg, rgba(201,169,110,0.15), rgba(201,169,110,0.06));
+    border: 1px solid rgba(201,169,110,0.35);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .upgrade-banner::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .upgrade-banner-badge {
+    display: inline-block;
+    background: rgba(201,169,110,0.2);
+    border: 1px solid rgba(201,169,110,0.35);
+    color: var(--gold);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 14px;
+  }
+  .upgrade-banner h3 {
+    font-size: 22px;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .upgrade-banner h3 .gold { color: var(--gold); }
+  .upgrade-banner p {
+    font-size: 14px;
+    color: var(--gray-light);
+    margin-bottom: 20px;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .upgrade-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .upgrade-old-price { font-size: 22px; color: var(--gray); text-decoration: line-through; opacity: 0.5; }
+  .upgrade-new-price { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; color: var(--gold); }
+  .upgrade-note { font-size: 12px; color: var(--gray); }
+
+  .upgrade-countdown {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .upgrade-countdown-text { font-size: 12px; color: var(--gray); }
+  .upgrade-cd-block {
+    background: rgba(201,169,110,0.12);
+    border: 1px solid rgba(201,169,110,0.25);
+    border-radius: 3px;
+    padding: 3px 8px;
+    text-align: center;
+    min-width: 36px;
+  }
+  .upgrade-cd-num { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 900; color: var(--gold); display: block; line-height: 1; }
+  .upgrade-cd-label { font-size: 8px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; }
+  .upgrade-cd-sep { color: var(--gold); font-weight: 700; }
+
+  /* PHASE LIST (complete plan) */
+  .phases-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .phase-pill {
+    background: rgba(201,169,110,0.06);
+    border: 1px solid rgba(201,169,110,0.15);
+    border-radius: 4px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--gray-light);
+  }
+  .phase-pill .check { color: var(--gold); font-size: 13px; }
+
+  /* ORDER ID */
+  .order-info {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    padding: 12px 16px;
+    margin-top: 16px;
+    font-size: 11px;
+    color: var(--gray);
+    text-align: center;
+  }
+  .order-info span { color: var(--gray-light); font-family: monospace; }
+
+  @media (max-width: 600px) {
+    .access-card-header, .access-card-body { padding: 18px 20px; }
+    .upgrade-banner { padding: 22px 18px; }
+    .upgrade-new-price { font-size: 36px; }
+    .phases-grid { grid-template-columns: 1fr; }
+    .navbar { padding: 0 16px; }
+    .btn-gold, .btn-outline { display: block; margin: 6px 0; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-logo">THE <span class="gold">DARK</span> PROTOCOL</div>
+</nav>
+
+<main class="ty-page">
+  <div class="ty-container">
+
+    <!-- SUCCESS HEADER -->
+    <div class="success-icon">🎯</div>
+    <div class="ty-badge" id="ty-badge">Payment Confirmed</div>
+    <h1 class="ty-title" id="ty-title">Welcome to <span class="gold">The Protocol</span></h1>
+    <p class="ty-subtitle" id="ty-subtitle">Your order is confirmed. Access your material below.</p>
+
+    <!-- ═══════════════════════════════════
+         PHASE I CONTENT (hidden by default)
+    ═══════════════════════════════════ -->
+    <div id="content-phase1" style="display:none;">
+
+      <!-- UPGRADE BANNER -->
+      <div class="upgrade-banner">
+        <div class="upgrade-banner-badge">⚡ Exclusive Offer — Active Now</div>
+        <h3>Complete the System for <span class="gold">$67</span></h3>
+        <p>You've just unlocked Phase I. Complete the full 6-phase transformation — we'll deduct your $9 from the price.</p>
+        <div class="upgrade-price-row">
+          <span class="upgrade-old-price">$97</span>
+          <span class="upgrade-new-price">$67</span>
+          <span class="upgrade-note">you save $30</span>
+        </div>
+        <div class="upgrade-countdown">
+          <span class="upgrade-countdown-text">Offer expires:</span>
+          <div class="upgrade-cd-block"><span class="upgrade-cd-num" id="ty-cd-hours">23</span><span class="upgrade-cd-label">HRS</span></div>
+          <span class="upgrade-cd-sep">:</span>
+          <div class="upgrade-cd-block"><span class="upgrade-cd-num" id="ty-cd-minutes">59</span><span class="upgrade-cd-label">MIN</span></div>
+          <span class="upgrade-cd-sep">:</span>
+          <div class="upgrade-cd-block"><span class="upgrade-cd-num" id="ty-cd-seconds">59</span><span class="upgrade-cd-label">SEC</span></div>
+        </div>
+        <a href="upgrade.html" class="btn-gold">Upgrade Now — $67</a>
+      </div>
+
+      <!-- PHASE I ACCESS -->
+      <div class="access-card">
+        <div class="access-card-header">
+          <div class="access-plan-title">Your Access</div>
+          <h2>Phase I — The Iron Mindset</h2>
+        </div>
+        <div class="access-card-body">
+          <div class="access-steps">
+            <div class="access-step">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>Check your email</h4>
+                <p>Your access link was sent to the email you used at PayPal checkout. Check your inbox (and spam folder).</p>
+              </div>
+            </div>
+            <div class="access-step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>Access Phase I Material</h4>
+                <!-- ════════════════════════════════════════════
+                  REPLACE THIS LINK with your actual course link
+                  e.g. Google Drive folder, Gumroad library,
+                  Teachable course URL, Notion page, etc.
+                ════════════════════════════════════════════ -->
+                <p>Click here to access Phase I: <a href="https://thedarkprotocol.gumroad.com/l/iqsfl" target="_blank" rel="noopener">Open Phase I Content →</a></p>
+              </div>
+            </div>
+            <div class="access-step">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>Save your order confirmation</h4>
+                <p>Your PayPal receipt is your proof of purchase. Save it — you'll need it to access your upgrade discount.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="order-id-phase1" class="order-info" style="display:none;">
+            Order ID: <span id="order-id-phase1-val"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+         COMPLETE CONTENT (hidden by default)
+    ═══════════════════════════════════ -->
+    <div id="content-complete" style="display:none;">
+
+      <!-- FULL ACCESS CARD -->
+      <div class="access-card">
+        <div class="access-card-header">
+          <div class="access-plan-title">Full Access Unlocked</div>
+          <h2>Complete System — All 6 Phases</h2>
+        </div>
+        <div class="access-card-body">
+
+          <div class="phases-grid" style="margin-bottom:24px;">
+            <div class="phase-pill"><span class="check">✓</span> Phase I — Iron Mindset</div>
+            <div class="phase-pill"><span class="check">✓</span> Phase II — Body Language</div>
+            <div class="phase-pill"><span class="check">✓</span> Phase III — Frame Control</div>
+            <div class="phase-pill"><span class="check">✓</span> Phase IV — Dark Psychology</div>
+            <div class="phase-pill"><span class="check">✓</span> Phase V — Seduction</div>
+            <div class="phase-pill"><span class="check">✓</span> Phase VI — Advanced Mastery</div>
+          </div>
+
+          <div class="access-steps">
+            <div class="access-step">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>Check your email</h4>
+                <p>Your full access link was sent to the email associated with your PayPal account.</p>
+              </div>
+            </div>
+            <div class="access-step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>Access the Complete System</h4>
+                <!-- ════════════════════════════════════════════
+                  REPLACE THIS LINK with your actual complete
+                  course access link (Google Drive, Teachable, etc.)
+                ════════════════════════════════════════════ -->
+                <p>Click here to access all 6 phases: <a href="https://thedarkprotocol.gumroad.com/l/sabryi" target="_blank" rel="noopener">Open Complete System →</a></p>
+              </div>
+            </div>
+            <div class="access-step">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>Join the Community</h4>
+                <p>Access your private community for support, accountability, and updates.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="order-id-complete" class="order-info" style="display:none;">
+            Order ID: <span id="order-id-complete-val"></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FALLBACK (if no plan in URL) -->
+    <div id="content-fallback" style="display:none;">
+      <div class="access-card">
+        <div class="access-card-header">
+          <div class="access-plan-title">Access</div>
+          <h2>Check Your Email</h2>
+        </div>
+        <div class="access-card-body">
+          <p style="color:var(--gray-light); font-size:14px;">Your access link was sent to your PayPal email address. If you don't see it within 5 minutes, check your spam folder or <a href="mailto:support@thedarkprotocol.com" style="color:var(--gold);">contact support</a>.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM BUTTONS -->
+    <div style="margin-top: 12px;">
+      <a href="index.html" class="btn-outline">← Back to Home</a>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // ══════════════════════════════════════════
+  // RENDER CORRECT CONTENT BASED ON ?plan=
+  // ══════════════════════════════════════════
+  (function() {
+    const params = new URLSearchParams(window.location.search);
+    const plan = params.get('plan');
+    const token = params.get('token');
+    const upgraded = params.get('upgraded') === 'true';
+
+    if (plan === 'phase1') {
+      document.getElementById('content-phase1').style.display = 'block';
+      document.getElementById('ty-title').innerHTML = 'Welcome to <span class="gold">Phase I</span>';
+      document.getElementById('ty-subtitle').textContent = 'Your payment is confirmed. Phase I is now yours — begin the transformation.';
+
+      if (token) {
+        const el = document.getElementById('order-id-phase1');
+        el.style.display = 'block';
+        document.getElementById('order-id-phase1-val').textContent = token;
+      }
+
+      // Show upgrade countdown
+      initUpgradeCountdown();
+
+    } else if (plan === 'complete') {
+      document.getElementById('content-complete').style.display = 'block';
+
+      if (upgraded) {
+        document.getElementById('ty-title').innerHTML = 'Upgrade <span class="gold">Complete</span>';
+        document.getElementById('ty-subtitle').textContent = 'You now have full access to all 6 phases. The full protocol is yours.';
+        document.getElementById('ty-badge').textContent = 'Upgrade Confirmed';
+      } else {
+        document.getElementById('ty-title').innerHTML = 'Full Access <span class="gold">Unlocked</span>';
+        document.getElementById('ty-subtitle').textContent = 'Your payment is confirmed. All 6 phases are now yours — begin your transformation.';
+      }
+
+      if (token) {
+        const el = document.getElementById('order-id-complete');
+        el.style.display = 'block';
+        document.getElementById('order-id-complete-val').textContent = token;
+      }
+
+    } else {
+      // No plan param — generic fallback
+      document.getElementById('content-fallback').style.display = 'block';
+    }
+  })();
+
+  // ══════════════════════════════════════════
+  // UPGRADE COUNTDOWN (mirrors upgrade.html)
+  // ══════════════════════════════════════════
+  function initUpgradeCountdown() {
+    const STORAGE_KEY = 'dp_upgrade_deadline';
+    let deadline = localStorage.getItem(STORAGE_KEY);
+
+    if (!deadline) {
+      deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      localStorage.setItem(STORAGE_KEY, deadline);
+    }
+
+    function update() {
+      const diff = Math.max(0, new Date(deadline).getTime() - Date.now());
+      const h = Math.floor(diff / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      const pad = n => String(n).padStart(2, '0');
+
+      const hEl = document.getElementById('ty-cd-hours');
+      const mEl = document.getElementById('ty-cd-minutes');
+      const sEl = document.getElementById('ty-cd-seconds');
+      if (hEl) { hEl.textContent = pad(h); mEl.textContent = pad(m); sEl.textContent = pad(s); }
+    }
+
+    update();
+    setInterval(update, 1000);
+  }
+</script>
+
+</body>
+</html>
