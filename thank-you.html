@@ -316,6 +316,49 @@
   }
   .phase-pill .check { color: var(--gold); font-size: 13px; }
 
+  /* ACCESS CODE BOX */
+  .code-box {
+    background: rgba(201,169,110,0.08);
+    border: 1px dashed rgba(201,169,110,0.5);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    text-align: center;
+  }
+  .code-label {
+    font-size: 11px;
+    color: var(--gray);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .code-value {
+    font-family: 'Courier New', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 3px;
+    background: rgba(201,169,110,0.1);
+    padding: 8px 20px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(201,169,110,0.3);
+  }
+  .code-value:hover { background: rgba(201,169,110,0.2); }
+  .code-copy-hint {
+    font-size: 11px;
+    color: var(--gray);
+  }
+  .code-copied {
+    font-size: 11px;
+    color: #6fcf97;
+    display: none;
+    margin-top: 4px;
+  }
+
   /* ORDER ID */
   .order-info {
     background: rgba(255,255,255,0.03);
@@ -392,27 +435,29 @@
             <div class="access-step">
               <div class="step-num">1</div>
               <div class="step-content">
-                <h4>Check your email</h4>
-                <p>Your access link was sent to the email you used at PayPal checkout. Check your inbox (and spam folder).</p>
+                <h4>Ve al link de acceso</h4>
+                <p>Haz clic aquí para ir a la página de descarga: <a href="https://thedarkprotocol.gumroad.com/l/iqsfl" target="_blank" rel="noopener">Acceder a Phase I →</a></p>
               </div>
             </div>
             <div class="access-step">
               <div class="step-num">2</div>
               <div class="step-content">
-                <h4>Access Phase I Material</h4>
-                <!-- ════════════════════════════════════════════
-                  REPLACE THIS LINK with your actual course link
-                  e.g. Google Drive folder, Gumroad library,
-                  Teachable course URL, Notion page, etc.
-                ════════════════════════════════════════════ -->
-                <p>Click here to access Phase I: <a href="https://thedarkprotocol.gumroad.com/l/iqsfl" target="_blank" rel="noopener">Open Phase I Content →</a></p>
+                <h4>Usa tu código de acceso gratuito</h4>
+                <p>Haz clic en <strong style="color:var(--white)">"I want this"</strong> e ingresa este código en el campo de descuento:</p>
+                <div class="code-box">
+                  <div class="code-label">Tu código de acceso</div>
+                  <div class="code-value" onclick="copyCode(this, 'DARKACCESS100')" title="Clic para copiar">DARKACCESS100</div>
+                  <div class="code-copy-hint">Clic para copiar</div>
+                  <div class="code-copied" id="copied-phase1">✓ Copiado</div>
+                </div>
+                <p style="font-size:13px;color:var(--gray)">El código aplica 100% de descuento — descarga gratis con tu email.</p>
               </div>
             </div>
             <div class="access-step">
               <div class="step-num">3</div>
               <div class="step-content">
-                <h4>Save your order confirmation</h4>
-                <p>Your PayPal receipt is your proof of purchase. Save it — you'll need it to access your upgrade discount.</p>
+                <h4>Guarda tu confirmación de PayPal</h4>
+                <p>Tu recibo de PayPal es tu prueba de compra. Guárdalo — lo necesitarás para activar el descuento de upgrade.</p>
               </div>
             </div>
           </div>
@@ -450,26 +495,29 @@
             <div class="access-step">
               <div class="step-num">1</div>
               <div class="step-content">
-                <h4>Check your email</h4>
-                <p>Your full access link was sent to the email associated with your PayPal account.</p>
+                <h4>Ve al link de acceso completo</h4>
+                <p>Haz clic aquí para ir a la página de descarga: <a href="https://thedarkprotocol.gumroad.com/l/sabryi" target="_blank" rel="noopener">Acceder al Sistema Completo →</a></p>
               </div>
             </div>
             <div class="access-step">
               <div class="step-num">2</div>
               <div class="step-content">
-                <h4>Access the Complete System</h4>
-                <!-- ════════════════════════════════════════════
-                  REPLACE THIS LINK with your actual complete
-                  course access link (Google Drive, Teachable, etc.)
-                ════════════════════════════════════════════ -->
-                <p>Click here to access all 6 phases: <a href="https://thedarkprotocol.gumroad.com/l/sabryi" target="_blank" rel="noopener">Open Complete System →</a></p>
+                <h4>Usa tu código de acceso gratuito</h4>
+                <p>Haz clic en <strong style="color:var(--white)">"I want this"</strong> e ingresa este código en el campo de descuento:</p>
+                <div class="code-box">
+                  <div class="code-label">Tu código de acceso</div>
+                  <div class="code-value" onclick="copyCode(this, 'DARKACCESS100')" title="Clic para copiar">DARKACCESS100</div>
+                  <div class="code-copy-hint">Clic para copiar</div>
+                  <div class="code-copied" id="copied-complete">✓ Copiado</div>
+                </div>
+                <p style="font-size:13px;color:var(--gray)">El código aplica 100% de descuento — descarga gratis con tu email.</p>
               </div>
             </div>
             <div class="access-step">
               <div class="step-num">3</div>
               <div class="step-content">
-                <h4>Join the Community</h4>
-                <p>Access your private community for support, accountability, and updates.</p>
+                <h4>Guarda tu confirmación de PayPal</h4>
+                <p>Tu recibo de PayPal es tu prueba de compra. Guárdalo como respaldo.</p>
               </div>
             </div>
           </div>
@@ -550,6 +598,35 @@
       document.getElementById('content-fallback').style.display = 'block';
     }
   })();
+
+  // ══════════════════════════════════════════
+  // COPY CODE TO CLIPBOARD
+  // ══════════════════════════════════════════
+  function copyCode(el, code) {
+    navigator.clipboard.writeText(code).then(function() {
+      // Show copied feedback
+      const hint = el.nextElementSibling;
+      const copied = hint.nextElementSibling;
+      hint.style.display = 'none';
+      copied.style.display = 'block';
+      el.style.background = 'rgba(111,207,151,0.15)';
+      el.style.borderColor = 'rgba(111,207,151,0.5)';
+      el.style.color = '#6fcf97';
+      setTimeout(function() {
+        hint.style.display = 'block';
+        copied.style.display = 'none';
+        el.style.background = '';
+        el.style.borderColor = '';
+        el.style.color = '';
+      }, 2500);
+    }).catch(function() {
+      // Fallback: select text
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      window.getSelection().removeAllRanges();
+      window.getSelection().addRange(range);
+    });
+  }
 
   // ══════════════════════════════════════════
   // UPGRADE COUNTDOWN (mirrors upgrade.html)
