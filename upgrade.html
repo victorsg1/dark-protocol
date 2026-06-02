@@ -549,7 +549,7 @@
           localStorage.setItem('dp_buyer_email', email);
           localStorage.removeItem('dp_upgrade_deadline');
           // Verify server-side + send access email
-          var FUNCTION_URL = 'YOUR_NETLIFY_SITE/.netlify/functions/send-access';
+          var FUNCTION_URL = 'https://earnest-cheesecake-d8a287.netlify.app/.netlify/functions/send-access';
           fetch(FUNCTION_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
