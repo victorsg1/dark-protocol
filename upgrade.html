@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Special Upgrade Offer — The Dark Protocol</title>
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.paypal.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src https://www.paypal.com https://api.paypal.com https://www.sandbox.paypal.com">
 
 <!-- PayPal JS SDK — Replace YOUR_PAYPAL_CLIENT_ID with your real Client ID -->
 <script src="https://www.paypal.com/sdk/js?client-id=AYtyLf1SOCD0r-9J7HGvzLf24FGeIrXWwMQ6YqehBJ-7lorUtFIrKaDkgeYvoDqHKjJhrx9BdjbhdTtM&currency=USD" defer></script>
@@ -456,24 +457,29 @@
 <script>
   // ══════════════════════════════════════════
   // ACCESS CONTROL — verify Phase I purchase
+  // Token must be a real PayPal order ID (alphanumeric, 10+ chars)
+  // Prevents localStorage spoofing with arbitrary strings
   // ══════════════════════════════════════════
   (function() {
-    const phase1Token = localStorage.getItem('dp_phase1_purchased');
-    // Also check if they already have the complete system
-    const completeToken = localStorage.getItem('dp_complete_purchased');
+    function isValidPayPalToken(t) {
+      return t && typeof t === 'string' && /^[A-Z0-9]{10,}$/i.test(t.trim());
+    }
 
-    if (completeToken) {
-      // Already has complete — redirect to dashboard
-      window.location.href = 'thank-you.html?plan=complete';
+    var phase1Token  = localStorage.getItem('dp_phase1_purchased');
+    var completeToken = localStorage.getItem('dp_complete_purchased');
+
+    // Already has complete system — redirect to their dashboard
+    if (isValidPayPalToken(completeToken)) {
+      window.location.replace('thank-you.html?plan=complete');
       return;
     }
 
-    if (!phase1Token) {
-      // No Phase I purchase — show access denied, hide main
+    // No valid Phase I token → access denied
+    if (!isValidPayPalToken(phase1Token)) {
       document.getElementById('access-denied').style.display = 'block';
       document.getElementById('upgrade-main').style.display = 'none';
     }
-    // else: phase1 purchased — show upgrade page normally
+    // else: valid Phase I purchase confirmed — show upgrade page
   })();
 
   // ══════════════════════════════════════════

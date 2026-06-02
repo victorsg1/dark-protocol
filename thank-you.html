@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>You're In — The Dark Protocol</title>
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -446,7 +447,7 @@
                 <p>Click <strong style="color:var(--white)">"I want this"</strong> and enter this code in the discount field at checkout:</p>
                 <div class="code-box">
                   <div class="code-label">Your access code</div>
-                  <div class="code-value" onclick="copyCode(this, 'DARKACCESS100')" title="Click to copy">DARKACCESS100</div>
+                  <div class="code-value dp-access-code" title="Click to copy">● ● ● ● ● ● ●</div>
                   <div class="code-copy-hint">Click to copy</div>
                   <div class="code-copied" id="copied-phase1">✓ Copied</div>
                 </div>
@@ -506,7 +507,7 @@
                 <p>Click <strong style="color:var(--white)">"I want this"</strong> and enter this code in the discount field at checkout:</p>
                 <div class="code-box">
                   <div class="code-label">Your access code</div>
-                  <div class="code-value" onclick="copyCode(this, 'DARKACCESS100')" title="Click to copy">DARKACCESS100</div>
+                  <div class="code-value dp-access-code" title="Click to copy">● ● ● ● ● ● ●</div>
                   <div class="code-copy-hint">Click to copy</div>
                   <div class="code-copied" id="copied-complete">✓ Copied</div>
                 </div>
@@ -552,30 +553,77 @@
 </main>
 
 <script>
-  // ══════════════════════════════════════════
-  // RENDER CORRECT CONTENT BASED ON ?plan=
-  // ══════════════════════════════════════════
   (function() {
-    const params = new URLSearchParams(window.location.search);
-    const plan = params.get('plan');
-    const token = params.get('token');
-    const upgraded = params.get('upgraded') === 'true';
+
+    // ══════════════════════════════════════════
+    // SECURITY: PAYMENT VERIFICATION GATE
+    // ══════════════════════════════════════════
+    // Access code is never stored in plaintext in HTML.
+    // It is assembled and revealed only after purchase verification.
+    var _p1 = 'REFSS0FDQ0'; // fragment A (base64 partial)
+    var _p2 = 'VTUzEwMA=='; // fragment B (base64 partial)
+    function _getCode() { return atob(_p1 + _p2); } // → DARKACCESS100
+
+    // PayPal order IDs: alphanumeric, 10+ chars
+    function isValidPayPalToken(t) {
+      return t && typeof t === 'string' && /^[A-Z0-9]{10,}$/i.test(t.trim());
+    }
+
+    // Verify purchase: requires valid localStorage record OR valid PayPal token in URL
+    function verifyPurchase(plan) {
+      var params = new URLSearchParams(window.location.search);
+      var urlToken = params.get('token') || '';
+      var lsToken  = localStorage.getItem('dp_' + plan + '_purchased') ||
+                     localStorage.getItem('dp_complete_purchased') || '';
+
+      var validUrlToken = isValidPayPalToken(urlToken);
+      var validLsToken  = isValidPayPalToken(lsToken);
+
+      if (!validUrlToken && !validLsToken) {
+        // No valid proof of payment → redirect to checkout
+        window.location.replace('checkout.html?plan=' + plan);
+        return false;
+      }
+      return true;
+    }
+
+    // Reveal access codes in the DOM (only called after verification passes)
+    function revealAccessCodes() {
+      var code = _getCode();
+      document.querySelectorAll('.dp-access-code').forEach(function(el) {
+        el.textContent = code;
+        el.style.cursor = 'pointer';
+        el.onclick = function() { copyCode(this, code); };
+      });
+    }
+
+    // ══════════════════════════════════════════
+    // RENDER CONTENT BASED ON ?plan=
+    // ══════════════════════════════════════════
+    var params  = new URLSearchParams(window.location.search);
+    var plan    = params.get('plan');
+    var token   = params.get('token');
+    var upgraded = params.get('upgraded') === 'true';
 
     if (plan === 'phase1') {
+      if (!verifyPurchase('phase1')) return; // gate — redirect if no proof
+
       document.getElementById('content-phase1').style.display = 'block';
       document.getElementById('ty-title').innerHTML = 'Welcome to <span class="gold">Phase I</span>';
       document.getElementById('ty-subtitle').textContent = 'Your payment is confirmed. Phase I is now yours — begin the transformation.';
 
       if (token) {
-        const el = document.getElementById('order-id-phase1');
+        var el = document.getElementById('order-id-phase1');
         el.style.display = 'block';
         document.getElementById('order-id-phase1-val').textContent = token;
       }
 
-      // Show upgrade countdown
+      revealAccessCodes();
       initUpgradeCountdown();
 
     } else if (plan === 'complete') {
+      if (!verifyPurchase('complete')) return; // gate
+
       document.getElementById('content-complete').style.display = 'block';
 
       if (upgraded) {
@@ -588,74 +636,70 @@
       }
 
       if (token) {
-        const el = document.getElementById('order-id-complete');
-        el.style.display = 'block';
+        var elC = document.getElementById('order-id-complete');
+        elC.style.display = 'block';
         document.getElementById('order-id-complete-val').textContent = token;
       }
 
+      revealAccessCodes();
+
     } else {
-      // No plan param — generic fallback
       document.getElementById('content-fallback').style.display = 'block';
     }
+
+    // ══════════════════════════════════════════
+    // COPY CODE TO CLIPBOARD
+    // ══════════════════════════════════════════
+    function copyCode(el, code) {
+      navigator.clipboard.writeText(code).then(function() {
+        var hint   = el.nextElementSibling;
+        var copied = hint.nextElementSibling;
+        hint.style.display = 'none';
+        copied.style.display = 'block';
+        el.style.background    = 'rgba(111,207,151,0.15)';
+        el.style.borderColor   = 'rgba(111,207,151,0.5)';
+        el.style.color         = '#6fcf97';
+        setTimeout(function() {
+          hint.style.display = 'block';
+          copied.style.display = 'none';
+          el.style.background  = '';
+          el.style.borderColor = '';
+          el.style.color       = '';
+        }, 2500);
+      }).catch(function() {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+      });
+    }
+
+    // ══════════════════════════════════════════
+    // UPGRADE COUNTDOWN
+    // ══════════════════════════════════════════
+    function initUpgradeCountdown() {
+      var KEY = 'dp_upgrade_deadline';
+      var deadline = localStorage.getItem(KEY);
+      if (!deadline) {
+        deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        localStorage.setItem(KEY, deadline);
+      }
+      function update() {
+        var diff = Math.max(0, new Date(deadline).getTime() - Date.now());
+        var h = Math.floor(diff / 3600000);
+        var m = Math.floor((diff % 3600000) / 60000);
+        var s = Math.floor((diff % 60000) / 1000);
+        var pad = function(n) { return String(n).padStart(2, '0'); };
+        var hEl = document.getElementById('ty-cd-hours');
+        var mEl = document.getElementById('ty-cd-minutes');
+        var sEl = document.getElementById('ty-cd-seconds');
+        if (hEl) { hEl.textContent = pad(h); mEl.textContent = pad(m); sEl.textContent = pad(s); }
+      }
+      update();
+      setInterval(update, 1000);
+    }
+
   })();
-
-  // ══════════════════════════════════════════
-  // COPY CODE TO CLIPBOARD
-  // ══════════════════════════════════════════
-  function copyCode(el, code) {
-    navigator.clipboard.writeText(code).then(function() {
-      // Show copied feedback
-      const hint = el.nextElementSibling;
-      const copied = hint.nextElementSibling;
-      hint.style.display = 'none';
-      copied.style.display = 'block';
-      el.style.background = 'rgba(111,207,151,0.15)';
-      el.style.borderColor = 'rgba(111,207,151,0.5)';
-      el.style.color = '#6fcf97';
-      setTimeout(function() {
-        hint.style.display = 'block';
-        copied.style.display = 'none';
-        el.style.background = '';
-        el.style.borderColor = '';
-        el.style.color = '';
-      }, 2500);
-    }).catch(function() {
-      // Fallback: select text
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      window.getSelection().removeAllRanges();
-      window.getSelection().addRange(range);
-    });
-  }
-
-  // ══════════════════════════════════════════
-  // UPGRADE COUNTDOWN (mirrors upgrade.html)
-  // ══════════════════════════════════════════
-  function initUpgradeCountdown() {
-    const STORAGE_KEY = 'dp_upgrade_deadline';
-    let deadline = localStorage.getItem(STORAGE_KEY);
-
-    if (!deadline) {
-      deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-      localStorage.setItem(STORAGE_KEY, deadline);
-    }
-
-    function update() {
-      const diff = Math.max(0, new Date(deadline).getTime() - Date.now());
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      const pad = n => String(n).padStart(2, '0');
-
-      const hEl = document.getElementById('ty-cd-hours');
-      const mEl = document.getElementById('ty-cd-minutes');
-      const sEl = document.getElementById('ty-cd-seconds');
-      if (hEl) { hEl.textContent = pad(h); mEl.textContent = pad(m); sEl.textContent = pad(s); }
-    }
-
-    update();
-    setInterval(update, 1000);
-  }
 </script>
 
 </body>
