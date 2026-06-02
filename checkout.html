@@ -461,12 +461,27 @@
   })();
 
   // ══════════════════════════════════════════
+  // SECURE API CALL — verify + send email
+  // Replace YOUR_NETLIFY_SITE with your Netlify
+  // app URL after deploying (e.g. https://dark-protocol.netlify.app)
+  // ══════════════════════════════════════════
+  var FUNCTION_URL = 'YOUR_NETLIFY_SITE/.netlify/functions/send-access';
+
+  function sendAccessEmail(orderId, plan, buyerEmail, buyerName) {
+    return fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: orderId, plan: plan, buyerEmail: buyerEmail, buyerName: buyerName })
+    }).catch(function(err) {
+      console.warn('Access email failed (non-blocking):', err);
+    });
+  }
+
+  // ══════════════════════════════════════════
   // PAYPAL SDK INITIALIZATION
   // ══════════════════════════════════════════
   function initPayPal() {
-    // Check if PayPal SDK loaded
     if (typeof paypal === 'undefined') {
-      // PayPal not configured or failed to load
       document.getElementById('config-notice').style.display = 'block';
       document.getElementById('loading-phase1').textContent = '⚙️ PayPal not configured yet — see setup instructions above.';
       document.getElementById('loading-complete').textContent = '⚙️ PayPal not configured yet — see setup instructions above.';
@@ -476,12 +491,7 @@
     // ─── PHASE I BUTTON ($9) ───
     document.getElementById('loading-phase1').style.display = 'none';
     paypal.Buttons({
-      style: {
-        layout: 'vertical',
-        color: 'gold',
-        shape: 'rect',
-        label: 'pay'
-      },
+      style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
       createOrder: function(data, actions) {
         return actions.order.create({
           purchase_units: [{
@@ -492,31 +502,29 @@
       },
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
-          // Store purchase in localStorage for upgrade path
+          var email = details.payer.email_address;
+          var name  = details.payer.name ? details.payer.name.given_name : '';
+          // Store in localStorage for upgrade path verification
           localStorage.setItem('dp_phase1_purchased', details.id);
           localStorage.setItem('dp_phase1_date', new Date().toISOString());
-          // Redirect to thank you page
-          window.location.href = 'thank-you.html?plan=phase1&token=' + details.id;
+          localStorage.setItem('dp_buyer_email', email);
+          // Call serverless function: verify order + send access email
+          sendAccessEmail(details.id, 'phase1', email, name).finally(function() {
+            window.location.href = 'thank-you.html?plan=phase1&token=' + details.id;
+          });
         });
       },
       onError: function(err) {
         console.error('PayPal error (Phase I):', err);
         document.getElementById('error-phase1').style.display = 'block';
       },
-      onCancel: function(data) {
-        // User cancelled — just stay on page
-      }
+      onCancel: function() {}
     }).render('#paypal-phase1');
 
     // ─── COMPLETE SYSTEM BUTTON ($97) ───
     document.getElementById('loading-complete').style.display = 'none';
     paypal.Buttons({
-      style: {
-        layout: 'vertical',
-        color: 'gold',
-        shape: 'rect',
-        label: 'pay'
-      },
+      style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
       createOrder: function(data, actions) {
         return actions.order.create({
           purchase_units: [{
@@ -527,9 +535,14 @@
       },
       onApprove: function(data, actions) {
         return actions.order.capture().then(function(details) {
+          var email = details.payer.email_address;
+          var name  = details.payer.name ? details.payer.name.given_name : '';
           localStorage.setItem('dp_complete_purchased', details.id);
           localStorage.setItem('dp_complete_date', new Date().toISOString());
-          window.location.href = 'thank-you.html?plan=complete&token=' + details.id;
+          localStorage.setItem('dp_buyer_email', email);
+          sendAccessEmail(details.id, 'complete', email, name).finally(function() {
+            window.location.href = 'thank-you.html?plan=complete&token=' + details.id;
+          });
         });
       },
       onError: function(err) {
