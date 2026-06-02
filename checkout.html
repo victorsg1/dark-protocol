@@ -5,11 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout — The Dark Protocol</title>
 <meta name="robots" content="noindex, nofollow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.paypal.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src https://www.paypal.com https://api.paypal.com https://www.sandbox.paypal.com">
-
-<!-- PayPal JS SDK — Replace YOUR_PAYPAL_CLIENT_ID with your real Client ID -->
-<!-- Get it free at: https://developer.paypal.com → My Apps & Credentials → Create App -->
-<script src="https://www.paypal.com/sdk/js?client-id=AYtyLf1SOCD0r-9J7HGvzLf24FGeIrXWwMQ6YqehBJ-7lorUtFIrKaDkgeYvoDqHKjJhrx9BdjbhdTtM&currency=USD" defer></script>
+<!-- PayPal JS SDK (no async/defer — required by PayPal) -->
+<script src="https://www.paypal.com/sdk/js?client-id=AYtyLf1SOCD0r-9J7HGvzLf24FGeIrXWwMQ6YqehBJ-7lorUtFIrKaDkgeYvoDqHKjJhrx9BdjbhdTtM&currency=USD"></script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
