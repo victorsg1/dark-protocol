@@ -1,0 +1,11 @@
+# Environment variables — NEVER push to GitHub
+.env
+.env.local
+.env.production
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
