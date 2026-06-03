@@ -664,18 +664,18 @@ body::after {
 }
 .phase-img {
   width:100%;
-  max-width:260px;
-  aspect-ratio:4/5;
+  aspect-ratio:16/9;
   object-fit:cover;
   border-radius:var(--radius-md);
   margin-bottom:24px;
   border:1px solid var(--border);
-  filter:brightness(0.9) contrast(1.05);
+  filter:brightness(0.85) contrast(1.08);
   transition:filter 300ms ease;
+  display:block;
 }
 .phase-card:hover .phase-img { filter:brightness(1) contrast(1.05); }
-.phase-card--hero .phase-img { max-width:100%; aspect-ratio:16/7; }
-.phase-card--full .phase-img { max-width:100%; aspect-ratio:21/6; }
+.phase-card--hero .phase-img { aspect-ratio:16/7; }
+.phase-card--full .phase-img { aspect-ratio:21/6; }
 
 .phase-modules {
   display:flex;
@@ -1209,7 +1209,7 @@ body::after {
     <div class="hero-visual">
       <div class="hero-img-outer">
         <div class="hero-img-inner">
-          <img src="https://victorsg1.github.io/dark-protocol/mockup.png"
+          <img src="../mockup.png"
                alt="The Dark Protocol — Course Mockup"
                width="400" loading="eager" fetchpriority="high">
         </div>
@@ -1317,7 +1317,7 @@ body::after {
       <div class="phase-card-inner">
         <div class="phase-num-display">01</div>
         <div class="phase-tag">Phase I</div>
-        <img src="https://victorsg1.github.io/dark-protocol/phase-01.jpg"
+        <img src="../phase-01.jpg"
              alt="Phase I — The Iron Mindset" class="phase-img" loading="lazy">
         <h3>The Iron Mindset</h3>
         <p class="phase-tagline">Before you can influence the world, you must master yourself.</p>
@@ -1334,6 +1334,7 @@ body::after {
       <div class="phase-card-inner">
         <div class="phase-num-display">02</div>
         <div class="phase-tag">Phase II</div>
+        <img src="../phase-02.jpg" alt="Phase II — The Ignition Protocol" class="phase-img" loading="lazy">
         <h3>The Ignition Protocol</h3>
         <p class="phase-tagline">Turn a single moment into a memorable connection.</p>
         <ul class="phase-modules">
@@ -1349,6 +1350,7 @@ body::after {
       <div class="phase-card-inner">
         <div class="phase-num-display">03</div>
         <div class="phase-tag">Phase III</div>
+        <img src="../phase-03.jpg" alt="Phase III — Dark Influence and Control" class="phase-img" loading="lazy">
         <h3>Dark Influence and Control</h3>
         <p class="phase-tagline">Understand the unseen forces that govern human interaction.</p>
         <ul class="phase-modules">
@@ -1364,6 +1366,7 @@ body::after {
       <div class="phase-card-inner">
         <div class="phase-num-display">04</div>
         <div class="phase-tag">Phase IV</div>
+        <img src="../phase-04.jpg" alt="Phase IV — Battlefield Tactics" class="phase-img" loading="lazy">
         <h3>Battlefield Tactics</h3>
         <p class="phase-tagline">Become the man who creates attraction anywhere, anytime.</p>
         <ul class="phase-modules">
@@ -1379,6 +1382,7 @@ body::after {
       <div class="phase-card-inner">
         <div class="phase-num-display">05</div>
         <div class="phase-tag">Phase V</div>
+        <img src="../phase-05.jpg" alt="Phase V — The Escalation Ladder" class="phase-img" loading="lazy">
         <h3>The Escalation Ladder</h3>
         <p class="phase-tagline">Convert attraction into deep connection and physical intimacy.</p>
         <ul class="phase-modules">
@@ -1394,7 +1398,7 @@ body::after {
       <div class="phase-card-inner">
         <div class="phase-num-display">06</div>
         <div class="phase-tag">Phase VI</div>
-        <img src="https://victorsg1.github.io/dark-protocol/phase-06.jpg"
+        <img src="../phase-06.jpg"
              alt="Phase VI — The Master's Path" class="phase-img" loading="lazy">
         <h3>The Master's Path</h3>
         <p class="phase-tagline">Integrate your skills into a powerful, authentic lifestyle that naturally attracts.</p>
