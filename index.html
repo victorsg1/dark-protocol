@@ -2330,7 +2330,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Agregar clases automáticamente a elementos que lo necesitan
   const sections = [
-    { selector: '.pain', class: 'fade-in' },
     { selector: '.solution', class: 'fade-in' },
     { selector: '.truth', class: 'fade-in' },
     { selector: '.course-overview', class: 'fade-in' },
@@ -2373,10 +2372,10 @@ document.addEventListener('DOMContentLoaded', function() {
     observer.observe(card);
   });
 
-  // Pain list items animation
-  const painItems = document.querySelectorAll('.pain-list li');
+  // Pain items staggered animation
+  const painItems = document.querySelectorAll('.pain-item');
   painItems.forEach((item, i) => {
-    item.style.animationDelay = (i * 0.05) + 's';
+    item.style.transitionDelay = (i * 0.12) + 's';
     item.classList.add('fade-in');
     observer.observe(item);
   });
