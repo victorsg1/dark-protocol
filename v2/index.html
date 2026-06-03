@@ -685,8 +685,9 @@ body::after {
 }
 .phase-img {
   width:100%;
-  aspect-ratio:16/9;
+  aspect-ratio:4/5;
   object-fit:cover;
+  object-position:center top;
   border-radius:var(--radius-md);
   margin-bottom:24px;
   border:1px solid var(--border);
@@ -695,8 +696,8 @@ body::after {
   display:block;
 }
 .phase-card:hover .phase-img { filter:brightness(1) contrast(1.05); }
-.phase-card--hero .phase-img { aspect-ratio:16/7; }
-.phase-card--full .phase-img { aspect-ratio:21/6; }
+.phase-card--hero .phase-img { aspect-ratio:16/9; object-position:center 15%; }
+.phase-card--full .phase-img { aspect-ratio:21/8; object-position:center 15%; }
 
 .phase-modules {
   display:flex;
