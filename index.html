@@ -911,6 +911,7 @@
   }
   .pain-img-wrap img {
     width: 100%;
+    height: auto;
     aspect-ratio: 4/3;
     object-fit: cover;
     object-position: center center;
@@ -918,7 +919,9 @@
     filter: brightness(0.6) contrast(1.1) saturate(0.65);
     transition: filter 400ms ease;
   }
-  .pain-item:hover .pain-img-wrap img { filter: brightness(0.75) contrast(1.08) saturate(0.8); }
+  @media (hover: hover) {
+    .pain-item:hover .pain-img-wrap img { filter: brightness(0.75) contrast(1.08) saturate(0.8); }
+  }
 
   .pain-text h3 {
     font-family: 'Playfair Display', serif;
@@ -933,11 +936,16 @@
   @media (max-width: 860px) {
     .pain-item,
     .pain-item:nth-child(even) { grid-template-columns: 1fr; gap: 20px; }
+    /* Same order for every item on one column: number, image, text */
+    .pain-item .pain-num,
     .pain-item:nth-child(even) .pain-num      { order: 1; }
+    .pain-item .pain-img-wrap,
     .pain-item:nth-child(even) .pain-img-wrap { order: 2; }
+    .pain-item .pain-text,
     .pain-item:nth-child(even) .pain-text     { order: 3; }
     .pain-num { font-size: 48px; }
-    .pain-img-wrap img { aspect-ratio: 16/9; }
+    /* Show the whole photo (native ~16:9) and lift it out of the shadows */
+    .pain-img-wrap img { aspect-ratio: 1100 / 614; filter: brightness(0.85) contrast(1.05) saturate(0.8); }
   }
 
   .section-label {
