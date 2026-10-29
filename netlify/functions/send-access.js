@@ -1,33 +1,55 @@
 /**
  * Netlify Serverless Function — send-access
  *
- * Flow:
- *  1. Receives orderId + plan + buyerEmail from the browser (after PayPal capture)
- *  2. Verifies the PayPal order is truly COMPLETED via PayPal's API (server-to-server)
- *  3. Sends the Gumroad access code to the buyer's email via Brevo
- *  4. The code NEVER appears in the browser — only in the email
+ * Actions (POST JSON body):
+ *  - { action: "send",   orderId }  (default) → verifies the PayPal order and emails
+ *                                    the access link + code to the PayPal payer's email
+ *  - { action: "verify", orderId }  → verifies the PayPal order and returns { verified, plan, value }
+ *                                    (used by thank-you.html to gate content + the Purchase pixel)
  *
- * Environment variables (set in Netlify dashboard → Site Settings → Environment):
- *   PAYPAL_CLIENT_ID      — from developer.paypal.com (same as in checkout.html)
- *   PAYPAL_CLIENT_SECRET  — from developer.paypal.com (reveal the secret in your app)
- *   PAYPAL_ENV            — "sandbox" for testing, "live" for production
- *   BREVO_API_KEY         — from brevo.com (free account → API Keys)
- *   SENDER_EMAIL          — your verified sender email in Brevo (e.g. you@gmail.com)
- *   GUMROAD_CODE          — DARKACCESS100
- *   GUMROAD_LINK_PHASE1   — https://thedarkprotocol.gumroad.com/l/iqsfl
- *   GUMROAD_LINK_COMPLETE — https://thedarkprotocol.gumroad.com/l/sabryi
+ * Security rules:
+ *  - The plan is derived from the amount PayPal actually captured, never from the browser.
+ *  - The email always goes to the PayPal payer's address, never to an address sent by the browser.
+ *  - The access code NEVER appears in the browser or in this repo — only in env vars / the email.
+ *  - If GUMROAD_ACCESS_TOKEN is set, each order gets its own single-use Gumroad offer code.
+ *
+ * Environment variables (Netlify → Project configuration → Environment variables):
+ *   PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_ENV ("sandbox" | "live")
+ *   BREVO_API_KEY, SENDER_EMAIL
+ *   GUMROAD_LINK_PHASE1, GUMROAD_LINK_COMPLETE
+ *   GUMROAD_ACCESS_TOKEN                 — optional, enables unique single-use codes
+ *   GUMROAD_PRODUCT_ID_PHASE1            — required with GUMROAD_ACCESS_TOKEN
+ *   GUMROAD_PRODUCT_ID_COMPLETE          — required with GUMROAD_ACCESS_TOKEN
+ *   GUMROAD_CODE_PHASE1                  — fallback code valid ONLY for the Phase I product
+ *   GUMROAD_CODE_COMPLETE                — fallback code valid ONLY for the Complete product
+ *   GUMROAD_CODE                         — legacy shared fallback (avoid: works on both products)
  */
 
-// Allow requests only from your GitHub Pages domain
-const ALLOWED_ORIGIN = 'https://victorsg1.github.io';
+const ALLOWED_ORIGINS = [
+  'https://victorsg1.github.io',
+  'https://earnest-cheesecake-d8a287.netlify.app'
+];
+
+// Amount captured by PayPal → plan. Anything else is rejected.
+const PLANS_BY_AMOUNT = {
+  '9.00':  { plan: 'phase1',   product: 'PHASE1',   label: 'Phase I — The Iron Mindset' },
+  '97.00': { plan: 'complete', product: 'COMPLETE', label: 'Complete System — All 6 Phases' },
+  '67.00': { plan: 'upgrade',  product: 'COMPLETE', label: 'Complete System (Upgrade)' }
+};
+
+// Access emails can only be (re)sent for orders captured in the last 30 days
+const SEND_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
 exports.handler = async (event) => {
+  const origin = event.headers && (event.headers.origin || event.headers.Origin);
   const headers = {
-    'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Vary': 'Origin',
     'Content-Type': 'application/json'
   };
+  const reply = (statusCode, data) => ({ statusCode, headers, body: JSON.stringify(data) });
 
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
@@ -35,7 +57,7 @@ exports.handler = async (event) => {
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return reply(405, { error: 'Method not allowed' });
   }
 
   // ── Parse body ──────────────────────────────────────────────────
@@ -43,87 +65,68 @@ exports.handler = async (event) => {
   try {
     body = JSON.parse(event.body || '{}');
   } catch {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid JSON' }) };
+    return reply(400, { error: 'Invalid JSON' });
   }
 
-  const { orderId, plan, buyerEmail, buyerName } = body;
-
-  // ── Input validation ────────────────────────────────────────────
-  if (!orderId || !plan || !buyerEmail) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing required fields' }) };
-  }
+  const orderId = typeof body.orderId === 'string' ? body.orderId.trim() : '';
+  const action = body.action === 'verify' ? 'verify' : 'send';
 
   // PayPal order IDs are alphanumeric, 10+ characters
-  if (!/^[A-Z0-9]{10,}$/i.test(orderId.trim())) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid order ID format' }) };
+  if (!/^[A-Z0-9]{10,30}$/i.test(orderId)) {
+    return reply(400, { error: 'Invalid order ID format' });
   }
-
-  const validPlans = ['phase1', 'complete', 'upgrade'];
-  if (!validPlans.includes(plan)) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid plan' }) };
-  }
-
-  // Basic email format check
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail)) {
-    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Invalid email' }) };
-  }
-
-  // ── PayPal server-side verification ────────────────────────────
-  const isSandbox = process.env.PAYPAL_ENV === 'sandbox';
-  const paypalBase = isSandbox
-    ? 'https://api-m.sandbox.paypal.com'
-    : 'https://api-m.paypal.com';
 
   try {
-    // Step 1: Get access token using Client ID + Secret (never exposed to browser)
-    const authRes = await fetch(`${paypalBase}/v1/oauth2/token`, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Basic ' + Buffer.from(
-          process.env.PAYPAL_CLIENT_ID + ':' + process.env.PAYPAL_CLIENT_SECRET
-        ).toString('base64'),
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: 'grant_type=client_credentials'
-    });
-
-    const authData = await authRes.json();
-
-    if (!authData.access_token) {
-      console.error('[send-access] PayPal auth failed:', JSON.stringify(authData));
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'PayPal auth failed' }) };
+    // ── PayPal server-side verification ──────────────────────────
+    const order = await fetchPayPalOrder(orderId);
+    if (!order) {
+      return reply(404, { verified: false, error: 'Order not found' });
     }
 
-    // Step 2: Fetch order details — verify it's truly COMPLETED
-    const orderRes = await fetch(`${paypalBase}/v2/checkout/orders/${orderId}`, {
-      headers: {
-        'Authorization': `Bearer ${authData.access_token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    const unit = (order.purchase_units || [])[0] || {};
+    const capture = ((unit.payments || {}).captures || [])[0];
 
-    const orderData = await orderRes.json();
-
-    if (orderData.status !== 'COMPLETED') {
-      console.error('[send-access] Order not completed:', orderId, orderData.status);
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Payment not verified — order status: ' + orderData.status })
-      };
+    if (order.status !== 'COMPLETED' || !capture || capture.status !== 'COMPLETED') {
+      console.error('[send-access] Order not completed:', orderId, order.status, capture && capture.status);
+      return reply(400, { verified: false, error: 'Payment not completed' });
     }
 
-    // ── Send access email via Brevo ─────────────────────────────
-    const code = process.env.GUMROAD_CODE;
-    const gumroadLink = plan === 'phase1'
-      ? process.env.GUMROAD_LINK_PHASE1
-      : process.env.GUMROAD_LINK_COMPLETE;
+    const amount = capture.amount || {};
+    const planInfo = amount.currency_code === 'USD' ? PLANS_BY_AMOUNT[amount.value] : null;
+    if (!planInfo) {
+      console.error('[send-access] Unexpected amount:', orderId, amount.value, amount.currency_code);
+      return reply(400, { verified: false, error: 'Unexpected payment amount' });
+    }
 
-    const planLabel = plan === 'phase1'
-      ? 'Phase I — The Iron Mindset'
-      : plan === 'upgrade'
-        ? 'Complete System (Upgrade)'
-        : 'Complete System — All 6 Phases';
+    if (action === 'verify') {
+      return reply(200, {
+        verified: true,
+        plan: planInfo.plan,
+        value: Number(amount.value),
+        currency: amount.currency_code
+      });
+    }
+
+    // ── Send access email ────────────────────────────────────────
+    const capturedAt = Date.parse(capture.create_time || order.create_time);
+    if (!capturedAt || Date.now() - capturedAt > SEND_WINDOW_MS) {
+      return reply(400, { error: 'Order too old — please contact support' });
+    }
+
+    const payer = order.payer || {};
+    const buyerEmail = payer.email_address;
+    const buyerName = (payer.name && payer.name.given_name) || '';
+    if (!buyerEmail) {
+      console.error('[send-access] No payer email on order:', orderId);
+      return reply(500, { error: 'No payer email on order' });
+    }
+
+    const gumroadLink = process.env['GUMROAD_LINK_' + planInfo.product];
+    const code = await getAccessCode(planInfo.product, orderId);
+    if (!gumroadLink || !code) {
+      console.error('[send-access] Missing Gumroad link or code for', planInfo.product);
+      return reply(500, { error: 'Access configuration missing' });
+    }
 
     const emailRes = await fetch('https://api.brevo.com/v3/smtp/email', {
       method: 'POST',
@@ -139,29 +142,109 @@ exports.handler = async (event) => {
         },
         to: [{ email: buyerEmail, name: buyerName || 'Customer' }],
         subject: 'Your Access Code — The Dark Protocol',
-        htmlContent: buildEmailHTML(buyerName, planLabel, gumroadLink, code, orderId)
+        htmlContent: buildEmailHTML(buyerName, planInfo.label, gumroadLink, code, orderId)
       })
     });
 
     // Brevo returns 201 on success, body contains messageId
     if (emailRes.status === 201) {
-      console.log('[send-access] Email sent to:', buyerEmail, 'plan:', plan, 'order:', orderId);
-      return { statusCode: 200, headers, body: JSON.stringify({ success: true }) };
+      console.log('[send-access] Email sent for order:', orderId, 'plan:', planInfo.plan);
+      return reply(200, { success: true, plan: planInfo.plan });
     } else {
-      const emailErr = await emailRes.json();
+      const emailErr = await emailRes.json().catch(() => ({}));
       console.error('[send-access] Brevo error:', JSON.stringify(emailErr));
-      return { statusCode: 500, headers, body: JSON.stringify({ error: 'Email delivery failed' }) };
+      return reply(500, { error: 'Email delivery failed' });
     }
 
   } catch (err) {
     console.error('[send-access] Unhandled error:', err.message);
-    return { statusCode: 500, headers, body: JSON.stringify({ error: 'Internal server error' }) };
+    return reply(500, { error: 'Internal server error' });
   }
 };
 
+// ── PayPal ──────────────────────────────────────────────────────
+async function fetchPayPalOrder(orderId) {
+  const paypalBase = process.env.PAYPAL_ENV === 'sandbox'
+    ? 'https://api-m.sandbox.paypal.com'
+    : 'https://api-m.paypal.com';
+
+  // Get access token using Client ID + Secret (never exposed to browser)
+  const authRes = await fetch(`${paypalBase}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Basic ' + Buffer.from(
+        process.env.PAYPAL_CLIENT_ID + ':' + process.env.PAYPAL_CLIENT_SECRET
+      ).toString('base64'),
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'grant_type=client_credentials'
+  });
+  const authData = await authRes.json();
+  if (!authData.access_token) {
+    throw new Error('PayPal auth failed: ' + (authData.error || authRes.status));
+  }
+
+  const orderRes = await fetch(`${paypalBase}/v2/checkout/orders/${encodeURIComponent(orderId)}`, {
+    headers: {
+      'Authorization': `Bearer ${authData.access_token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  if (orderRes.status === 404) return null;
+  if (!orderRes.ok) throw new Error('PayPal order lookup failed: ' + orderRes.status);
+  return orderRes.json();
+}
+
+// ── Gumroad access code ─────────────────────────────────────────
+// With GUMROAD_ACCESS_TOKEN: one 100%-off code per order, usable once.
+// The name is derived from the order ID, so a resend reuses the same code.
+async function getAccessCode(product, orderId) {
+  const token = process.env.GUMROAD_ACCESS_TOKEN;
+  const productId = process.env['GUMROAD_PRODUCT_ID_' + product];
+
+  if (token && productId) {
+    try {
+      const name = 'DP' + orderId.toUpperCase().slice(-12);
+      const base = `https://api.gumroad.com/v2/products/${encodeURIComponent(productId)}/offer_codes`;
+
+      const listRes = await fetch(`${base}?access_token=${encodeURIComponent(token)}`);
+      const list = await listRes.json();
+      if (list.success && (list.offer_codes || []).some((c) => c.name === name)) {
+        return name;
+      }
+
+      const createRes = await fetch(base, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          access_token: token,
+          name,
+          amount_off: '100',
+          offer_type: 'percent',
+          max_purchase_count: '1'
+        }).toString()
+      });
+      const created = await createRes.json();
+      if (created.success) return name;
+      console.error('[send-access] Gumroad offer code error:', JSON.stringify(created));
+    } catch (err) {
+      console.error('[send-access] Gumroad API failed:', err.message);
+    }
+  }
+
+  // Per-product code, so a Phase I buyer can't use it on the Complete product
+  return process.env['GUMROAD_CODE_' + product] || process.env.GUMROAD_CODE || null;
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
 // ── Email template ──────────────────────────────────────────────
 function buildEmailHTML(name, planLabel, gumroadLink, code, orderId) {
-  const greeting = name ? `Hey ${name},` : 'Hey,';
+  const greeting = name ? `Hey ${escapeHTML(name)},` : 'Hey,';
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -206,15 +289,15 @@ function buildEmailHTML(name, planLabel, gumroadLink, code, orderId) {
       then paste this code at checkout for 100% off:
     </p>
     <div style="background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.3);border-radius:4px;padding:16px 28px;display:inline-block;">
-      <span style="font-family:'Courier New',Courier,monospace;font-size:28px;font-weight:700;color:#C9A96E;letter-spacing:5px;">${code}</span>
+      <span style="font-family:'Courier New',Courier,monospace;font-size:28px;font-weight:700;color:#C9A96E;letter-spacing:5px;">${escapeHTML(code)}</span>
     </div>
-    <p style="font-size:12px;color:#555555;margin:12px 0 0;">Free download — enter your email on Gumroad to receive your files</p>
+    <p style="font-size:12px;color:#555555;margin:12px 0 0;">Personal code — do not share it. Enter your email on Gumroad to receive your files.</p>
   </div>
 
   <!-- Footer -->
   <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:20px;text-align:center;">
     <p style="color:#444444;font-size:11px;line-height:1.9;margin:0;">
-      Order ID: <span style="color:#666666;font-family:'Courier New',monospace;font-size:10px;">${orderId}</span><br>
+      Order ID: <span style="color:#666666;font-family:'Courier New',monospace;font-size:10px;">${escapeHTML(orderId)}</span><br>
       Having trouble? Reply to this email or contact
       <a href="mailto:support@thedarkprotocol.com" style="color:#C9A96E;text-decoration:none;">support@thedarkprotocol.com</a><br><br>
       <strong style="color:#C9A96E;letter-spacing:2px;font-size:12px;">THE DARK PROTOCOL</strong>
