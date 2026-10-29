@@ -143,6 +143,10 @@
     font-size: 16px;
     line-height: 1.7;
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-optical-sizing: auto;
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -151,9 +155,13 @@
     font-weight: 700;
   }
 
+  /* Tracking and leading tighten as type grows */
+  h2 { line-height: 1.12; letter-spacing: -0.015em; }
+  h3 { letter-spacing: -0.01em; }
+
   a {
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: color 0.2s ease;
   }
 
   /* ══════════════════════════════════
@@ -163,22 +171,21 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 999;
-    background: rgba(10, 10, 10, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(201, 169, 110, 0.1);
+    background: rgba(10, 10, 10, 0.55);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid transparent;
     padding: 16px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 70px;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
   .navbar.scrolled {
-    background: rgba(10, 10, 10, 0.95);
-    border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+    background: rgba(10, 10, 10, 0.78);
+    border-bottom-color: rgba(201, 169, 110, 0.12);
   }
 
   .navbar-logo {
@@ -186,7 +193,7 @@
     font-size: 18px;
     font-weight: 900;
     color: var(--white);
-    letter-spacing: 2px;
+    letter-spacing: 0.16em;
     white-space: nowrap;
   }
 
@@ -203,7 +210,7 @@
     color: #AAA;
     font-size: 12px;
     font-weight: 500;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     transition: color 0.25s ease;
     white-space: nowrap;
@@ -235,9 +242,9 @@
     padding: 10px 24px !important;
     font-weight: 700 !important;
     font-size: 11px !important;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.12em;
     border-radius: 4px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1) !important;
+    transition: transform 0.25s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.25s cubic-bezier(0.23, 1, 0.32, 1) !important;
     box-shadow: 0 4px 15px rgba(201, 169, 110, 0.2);
     position: relative;
     overflow: hidden;
@@ -252,13 +259,13 @@
     height: 200%;
     background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
     transform: translate(50%, 50%);
-    transition: all 0.6s ease;
+    transition: transform 0.6s ease, box-shadow 0.6s ease, background-color 0.6s ease, border-color 0.6s ease, color 0.6s ease, opacity 0.6s ease;
   }
 
   .navbar-cta:hover {
     background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%) !important;
-    box-shadow: 0 12px 40px rgba(201, 169, 110, 0.5) !important;
-    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 24px rgba(201, 169, 110, 0.35) !important;
+    transform: translateY(-1px) !important;
   }
 
   .navbar-toggle {
@@ -294,6 +301,7 @@
   ══════════════════════════════════ */
   .hero {
     min-height: 100vh;
+    min-height: 100svh;
     background: linear-gradient(135deg, #1a1208 0%, #0A0A0A 50%, #0D0D0D 100%);
     display: flex;
     flex-direction: column;
@@ -312,20 +320,6 @@
       radial-gradient(circle at 20% 50%, rgba(201, 169, 110, 0.08) 0%, transparent 50%),
       radial-gradient(circle at 80% 80%, rgba(201, 169, 110, 0.05) 0%, transparent 50%);
     pointer-events: none;
-    animation: glow 4s ease-in-out infinite;
-  }
-
-  .hero::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background:
-      linear-gradient(45deg, transparent 0%, rgba(201, 169, 110, 0.02) 25%, transparent 50%, rgba(201, 169, 110, 0.02) 75%, transparent 100%);
-    animation: rotateScale 15s linear infinite;
-    pointer-events: none;
   }
 
   .hero-badge {
@@ -336,16 +330,16 @@
     color: var(--gold);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     padding: 10px 24px;
     margin-bottom: 40px;
     background: rgba(201, 169, 110, 0.08);
     backdrop-filter: blur(10px);
     border-radius: 4px;
-    animation: fadeInDown 0.8s ease, pulse 2s ease-in-out 0.8s infinite;
+    animation: fadeInDown 0.6s cubic-bezier(0.23, 1, 0.32, 1) both;
     box-shadow: 0 4px 16px rgba(201, 169, 110, 0.15);
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
   }
 
   .hero-badge:hover {
@@ -358,10 +352,11 @@
     font-size: clamp(48px, 8vw, 96px);
     font-weight: 900;
     color: var(--white);
-    letter-spacing: -2px;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
     max-width: 900px;
     margin-bottom: 20px;
-    animation: fadeInUp 0.8s ease 0.1s both;
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.1s both;
     text-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
   }
 
@@ -374,7 +369,7 @@
     color: var(--gold-light);
     max-width: 700px;
     margin-bottom: 24px;
-    animation: fadeInUp 0.8s ease 0.2s both;
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.2s both;
   }
 
   .hero-desc {
@@ -382,7 +377,7 @@
     color: #BBB;
     max-width: 650px;
     margin-bottom: 60px;
-    animation: fadeInUp 0.8s ease 0.3s both;
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.3s both;
     line-height: 1.8;
   }
 
@@ -392,7 +387,7 @@
     margin: 0 auto 60px;
     position: relative;
     z-index: 1;
-    animation: floatIn 1s ease 0.4s both, floatY 4s ease-in-out 1.4s infinite;
+    animation: floatIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.3s both;
     filter: drop-shadow(0 40px 80px rgba(201, 169, 110, 0.25));
     border-radius: 8px;
   }
@@ -409,7 +404,7 @@
     flex-direction: column;
     align-items: center;
     gap: 16px;
-    animation: fadeInUp 0.8s ease 0.5s both;
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.5s both;
   }
 
   .btn-primary {
@@ -419,13 +414,13 @@
     font-family: 'Inter', sans-serif;
     font-weight: 700;
     font-size: 15px;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 18px 56px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     box-shadow: 0 12px 30px rgba(201, 169, 110, 0.25);
     position: relative;
     overflow: hidden;
@@ -442,31 +437,21 @@
     transition: left 0.4s ease;
   }
 
-  .btn-primary::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-
   .btn-primary:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 60px rgba(201, 169, 110, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(201, 169, 110, 0.35);
   }
 
   .btn-primary:hover::before {
     left: 100%;
   }
 
-  .btn-primary:active::after {
-    width: 300px;
-    height: 300px;
+  .btn-primary:active,
+  .btn-secondary:active,
+  .navbar-cta:active,
+  .pricing-cta:active {
+    transform: scale(0.97) !important;
+    transition-duration: 0.1s !important;
   }
 
   .btn-secondary {
@@ -476,13 +461,13 @@
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     font-size: 14px;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 16px 48px;
     background: transparent;
     cursor: pointer;
     border-radius: 4px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     position: relative;
     overflow: hidden;
   }
@@ -501,8 +486,8 @@
   .btn-secondary:hover {
     border-color: var(--gold-light);
     background: rgba(201, 169, 110, 0.12);
-    box-shadow: 0 12px 32px rgba(201, 169, 110, 0.25);
-    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(201, 169, 110, 0.2);
+    transform: translateY(-2px);
   }
 
   .btn-secondary:hover::before {
@@ -513,22 +498,22 @@
     font-size: 13px;
     color: var(--gray);
     margin-top: 20px;
-    letter-spacing: 1px;
-    animation: fadeInUp 0.8s ease 0.6s both;
+    letter-spacing: 0.08em;
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.6s both;
   }
 
   @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-20px); }
+    from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(12px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   @keyframes floatIn {
-    from { opacity: 0; transform: scale(0.95) translateY(30px); }
+    from { opacity: 0; transform: scale(0.97) translateY(16px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
   }
 
@@ -575,8 +560,8 @@
   /* Scroll Animation Class */
   .fade-in {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+    transform: translateY(16px);
+    transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1), transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .fade-in.visible {
@@ -587,7 +572,7 @@
   .slide-left {
     opacity: 0;
     transform: translateX(-40px);
-    transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.8s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.8s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.8s cubic-bezier(0.23, 1, 0.320, 1), color 0.8s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.8s cubic-bezier(0.23, 1, 0.320, 1);
   }
 
   .slide-left.visible {
@@ -598,7 +583,7 @@
   .slide-right {
     opacity: 0;
     transform: translateX(40px);
-    transition: all 0.8s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.8s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.8s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.8s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.8s cubic-bezier(0.23, 1, 0.320, 1), color 0.8s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.8s cubic-bezier(0.23, 1, 0.320, 1);
   }
 
   .slide-right.visible {
@@ -640,7 +625,7 @@
     max-width: 850px;
     margin: 0 auto 32px;
     line-height: 1.6;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.01em;
     position: relative;
     z-index: 1;
   }
@@ -650,7 +635,7 @@
     font-size: 12px;
     font-style: normal;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     position: relative;
     z-index: 1;
@@ -690,7 +675,7 @@
     box-shadow: 0 60px 120px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(201, 169, 110, 0.15);
     cursor: pointer;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
   }
 
   .vsl-wrap:hover {
@@ -734,11 +719,10 @@
     align-items: center;
     justify-content: center;
     margin-bottom: 16px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     backdrop-filter: blur(8px);
     box-shadow: 0 8px 32px rgba(201, 169, 110, 0.15);
     position: relative;
-    animation: pulse 2s ease-in-out infinite;
   }
 
   .vsl-big-play::before {
@@ -747,7 +731,6 @@
     inset: -8px;
     border-radius: 50%;
     border: 2px solid rgba(201, 169, 110, 0.3);
-    animation: pulse 2.5s ease-in-out infinite;
   }
 
   .vsl-big-play::after {
@@ -756,7 +739,6 @@
     inset: -16px;
     border-radius: 50%;
     border: 1px solid rgba(201, 169, 110, 0.15);
-    animation: pulse 3s ease-in-out infinite;
   }
 
   .vsl-big-play svg {
@@ -777,7 +759,7 @@
   .vsl-thumb p {
     color: rgba(255, 255, 255, 0.8);
     font-size: 12px;
-    letter-spacing: 3px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     font-weight: 600;
   }
@@ -875,7 +857,7 @@
     color: #BBB;
     font-size: 12px;
     font-family: monospace;
-    letter-spacing: 1px;
+    letter-spacing: 0.08em;
     user-select: none;
   }
 
@@ -962,7 +944,7 @@
     color: var(--gold);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 3px;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     margin-bottom: 20px;
     display: inline-block;
@@ -970,7 +952,7 @@
     border: 1px solid rgba(201, 169, 110, 0.15);
     padding: 8px 16px;
     border-radius: 4px;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
     animation: fadeInDown 0.8s ease 0.2s both;
   }
 
@@ -1000,7 +982,7 @@
     color: #BBB;
     font-size: 17px;
     border-bottom: 1px solid rgba(201, 169, 110, 0.05);
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
   }
 
   .pain-list li:hover {
@@ -1119,7 +1101,7 @@
     padding: 52px 40px;
     text-align: left;
     border-radius: 8px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     position: relative;
     overflow: hidden;
   }
@@ -1177,7 +1159,7 @@
     color: var(--gold);
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     margin-bottom: 12px;
   }
@@ -1240,7 +1222,7 @@
     margin-left: 0;
     margin-right: 0;
     border: 1px solid rgba(201, 169, 110, 0.15);
-    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.3s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.3s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.3s cubic-bezier(0.23, 1, 0.320, 1), color 0.3s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.3s cubic-bezier(0.23, 1, 0.320, 1);
   }
 
   .phase-card:hover .phase-card-image {
@@ -1296,13 +1278,12 @@
     line-height: 1;
     margin-bottom: 8px;
     text-shadow: 0 0 20px rgba(201, 169, 110, 0.3);
-    animation: glow 2s ease-in-out infinite;
   }
 
   .stat-label {
     color: var(--gray);
     font-size: 12px;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
@@ -1320,7 +1301,7 @@
     padding: 44px 36px;
     text-align: left;
     border-radius: 8px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -1358,7 +1339,7 @@
     color: var(--gold);
     font-size: 10px;
     font-weight: 700;
-    letter-spacing: 1px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     padding: 6px 12px;
     margin-bottom: 16px;
@@ -1369,7 +1350,7 @@
   .stars {
     color: var(--gold);
     font-size: 16px;
-    letter-spacing: 4px;
+    letter-spacing: 0.25em;
     margin-bottom: 20px;
   }
 
@@ -1458,7 +1439,7 @@
     position: relative;
     text-align: left;
     border-radius: 12px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     overflow: hidden;
   }
 
@@ -1488,7 +1469,6 @@
     background: linear-gradient(135deg, rgba(201, 169, 110, 0.1) 0%, var(--dark-2) 100%);
     transform: scale(1.025);
     box-shadow: 0 40px 100px rgba(201, 169, 110, 0.25);
-    animation: glow 3s ease-in-out infinite;
   }
 
   .pricing-card.featured:hover {
@@ -1505,7 +1485,7 @@
     color: var(--dark);
     font-size: 11px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     padding: 8px 24px;
     white-space: nowrap;
@@ -1527,10 +1507,6 @@
     line-height: 1;
     margin: 32px 0 12px;
     text-shadow: 0 0 20px rgba(201, 169, 110, 0.3);
-  }
-
-  .pricing-card.featured .price {
-    animation: glow 2.5s ease-in-out infinite;
   }
 
   .pricing-card .price::before {
@@ -1591,13 +1567,13 @@
     padding: 16px;
     font-weight: 700;
     font-size: 14px;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     border: none;
     font-family: 'Inter', sans-serif;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
   }
 
   .pricing-card.featured .pricing-cta {
@@ -1721,12 +1697,12 @@
     color: var(--dark);
     font-weight: 700;
     font-size: 12px;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     padding: 12px 28px;
     white-space: nowrap;
     border-radius: 4px;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.320, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.320, 1), background-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), border-color 0.4s cubic-bezier(0.23, 1, 0.320, 1), color 0.4s cubic-bezier(0.23, 1, 0.320, 1), opacity 0.4s cubic-bezier(0.23, 1, 0.320, 1);
     box-shadow: 0 4px 12px rgba(201, 169, 110, 0.2);
     position: relative;
     overflow: hidden;
@@ -1813,6 +1789,39 @@
     .phase-num { font-size: 48px; }
     .pricing-card .price { font-size: 56px; }
   }
+  /* ══════════════════════════════════
+     INPUT & ACCESSIBILITY PREFERENCES
+  ══════════════════════════════════ */
+  a, button { touch-action: manipulation; }
+
+  /* Touch screens: hover effects would stick after a tap */
+  @media (hover: none) {
+    .btn-primary:hover, .btn-secondary:hover, .navbar-cta:hover,
+    .phase-card:hover, .testimonial-card:hover, .pricing-card:hover,
+    .pain-list li:hover, .vsl-wrap:hover, .hero-badge:hover {
+      transform: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      animation-delay: 0s !important;
+      transition-duration: 0.01ms !important;
+    }
+    .fade-in, .slide-left, .slide-right { opacity: 1; transform: none; }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .navbar, .navbar.scrolled { background: var(--dark); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+
+  @media (prefers-contrast: more) {
+    .navbar { background: var(--dark); border-bottom-color: var(--gold); }
+    .hero-desc, .pain-text p { color: var(--light); }
+  }
 </style>
 <!-- Meta Pixel Code -->
 <script>
@@ -1855,15 +1864,10 @@ function toggleNav() {
 function closeNav() {
   document.getElementById('navLinks').classList.remove('open');
 }
-// Navbar scroll effect
+// Navbar: show the hairline once content scrolls under it
 window.addEventListener('scroll', function() {
-  const navbar = document.getElementById('navbar');
-  if (window.scrollY > 50) {
-    navbar.classList.add('scrolled');
-  } else {
-    navbar.classList.remove('scrolled');
-  }
-});
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+}, { passive: true });
 </script>
 
 <!-- HERO -->
@@ -2336,31 +2340,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }, observerOptions);
 
-  // Agregar clases automáticamente a elementos que lo necesitan
-  const sections = [
-    { selector: '.solution', class: 'fade-in' },
-    { selector: '.truth', class: 'fade-in' },
-    { selector: '.course-overview', class: 'fade-in' },
-    { selector: '.testimonials', class: 'fade-in' },
-    { selector: '.pricing', class: 'fade-in' },
-    { selector: '.final-cta', class: 'fade-in' },
-    { selector: '.manifesto', class: 'fade-in' },
-    { selector: '.video-section', class: 'fade-in' }
-  ];
-
-  sections.forEach(sec => {
-    const el = document.querySelector(sec.selector);
-    if (el) {
-      el.classList.add(sec.class);
-      observer.observe(el);
-    }
-  });
+  // Reduced motion: leave everything visible, no reveals
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   // Phase cards with staggered animation
   const phaseCards = document.querySelectorAll('.phase-card');
   phaseCards.forEach((card, i) => {
     card.classList.add('fade-in');
-    card.style.animationDelay = (i * 0.08) + 's';
+    card.style.transitionDelay = Math.min(i * 0.05, 0.2) + 's';
     observer.observe(card);
   });
 
@@ -2368,7 +2355,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const testimonialCards = document.querySelectorAll('.testimonial-card');
   testimonialCards.forEach((card, i) => {
     card.classList.add('fade-in');
-    card.style.animationDelay = (i * 0.06) + 's';
+    card.style.transitionDelay = Math.min(i * 0.05, 0.2) + 's';
     observer.observe(card);
   });
 
@@ -2376,46 +2363,19 @@ document.addEventListener('DOMContentLoaded', function() {
   const pricingCards = document.querySelectorAll('.pricing-card');
   pricingCards.forEach((card, i) => {
     card.classList.add('fade-in');
-    card.style.animationDelay = (i * 0.12) + 's';
+    card.style.transitionDelay = (i * 0.06) + 's';
     observer.observe(card);
   });
 
   // Pain items staggered animation
   const painItems = document.querySelectorAll('.pain-item');
   painItems.forEach((item, i) => {
-    item.style.transitionDelay = (i * 0.12) + 's';
+    item.style.transitionDelay = '0s';
     item.classList.add('fade-in');
     observer.observe(item);
   });
 });
 
-// Parallax effect en hero - más suave
-let ticking = false;
-window.addEventListener('scroll', function() {
-  if (!ticking) {
-    window.requestAnimationFrame(function() {
-      const hero = document.querySelector('.hero');
-      const scrollY = window.scrollY;
-
-      if (hero && scrollY < window.innerHeight) {
-        hero.style.transform = `translateY(${scrollY * 0.4}px)`;
-      }
-
-      // Dynamic nav background on scroll
-      const navbar = document.getElementById('navbar');
-      if (navbar) {
-        if (scrollY > 100) {
-          navbar.classList.add('scrolled');
-        } else {
-          navbar.classList.remove('scrolled');
-        }
-      }
-
-      ticking = false;
-    });
-    ticking = true;
-  }
-});
 </script>
 
 <!-- VIDEO PLAYER SCRIPT -->
