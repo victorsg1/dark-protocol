@@ -8,6 +8,5 @@
 [[headers]]
   for = "/.netlify/functions/*"
   [headers.values]
-    Access-Control-Allow-Origin = "https://victorsg1.github.io"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"

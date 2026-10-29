@@ -18,16 +18,16 @@
  *   BREVO_API_KEY, SENDER_EMAIL
  *   GUMROAD_LINK_PHASE1, GUMROAD_LINK_COMPLETE
  *   GUMROAD_ACCESS_TOKEN                 — optional, enables unique single-use codes
- *   GUMROAD_PRODUCT_ID_PHASE1            — required with GUMROAD_ACCESS_TOKEN
- *   GUMROAD_PRODUCT_ID_COMPLETE          — required with GUMROAD_ACCESS_TOKEN
+ *   GUMROAD_PRODUCT_ID_PHASE1            — optional; looked up from GUMROAD_LINK_PHASE1 if missing
+ *   GUMROAD_PRODUCT_ID_COMPLETE          — optional; looked up from GUMROAD_LINK_COMPLETE if missing
  *   GUMROAD_CODE_PHASE1                  — fallback code valid ONLY for the Phase I product
  *   GUMROAD_CODE_COMPLETE                — fallback code valid ONLY for the Complete product
  *   GUMROAD_CODE                         — legacy shared fallback (avoid: works on both products)
  */
 
 const ALLOWED_ORIGINS = [
-  'https://victorsg1.github.io',
-  'https://earnest-cheesecake-d8a287.netlify.app'
+  'https://thedarkprotocol.netlify.app',
+  'https://victorsg1.github.io'
 ];
 
 // Amount captured by PayPal → plan. Anything else is rejected.
@@ -200,10 +200,13 @@ async function fetchPayPalOrder(orderId) {
 // The name is derived from the order ID, so a resend reuses the same code.
 async function getAccessCode(product, orderId) {
   const token = process.env.GUMROAD_ACCESS_TOKEN;
-  const productId = process.env['GUMROAD_PRODUCT_ID_' + product];
 
-  if (token && productId) {
+  if (token) {
     try {
+      const productId = process.env['GUMROAD_PRODUCT_ID_' + product] ||
+        await findGumroadProductId(token, process.env['GUMROAD_LINK_' + product]);
+      if (!productId) throw new Error('Gumroad product not found for ' + product);
+
       const name = 'DP' + orderId.toUpperCase().slice(-12);
       const base = `https://api.gumroad.com/v2/products/${encodeURIComponent(productId)}/offer_codes`;
 
@@ -234,6 +237,19 @@ async function getAccessCode(product, orderId) {
 
   // Per-product code, so a Phase I buyer can't use it on the Complete product
   return process.env['GUMROAD_CODE_' + product] || process.env.GUMROAD_CODE || null;
+}
+
+// Finds the product ID from its Gumroad link (e.g. .../l/iqsfl → the product whose URL ends in "iqsfl")
+async function findGumroadProductId(token, link) {
+  const slug = (link || '').split('?')[0].replace(/\/+$/, '').split('/').pop();
+  if (!slug) return null;
+  const res = await fetch(`https://api.gumroad.com/v2/products?access_token=${encodeURIComponent(token)}`);
+  const data = await res.json();
+  const match = (data.products || []).find((p) =>
+    p.custom_permalink === slug ||
+    (p.short_url || '').replace(/\/+$/, '').split('/').pop() === slug
+  );
+  return match ? match.id : null;
 }
 
 function escapeHTML(s) {

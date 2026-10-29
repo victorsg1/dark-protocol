@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>/* Single home: send GitHub Pages visitors to the Netlify site */if(location.hostname==='victorsg1.github.io'){location.replace('https://thedarkprotocol.netlify.app'+location.pathname.replace(/^\/dark-protocol/,'')+location.search+location.hash);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Special Upgrade Offer — The Dark Protocol</title>
 <meta name="robots" content="noindex, nofollow">
@@ -547,7 +548,7 @@
           localStorage.setItem('dp_buyer_email', email);
           localStorage.removeItem('dp_upgrade_deadline');
           // Verify server-side + send access email
-          var FUNCTION_URL = 'https://earnest-cheesecake-d8a287.netlify.app/.netlify/functions/send-access';
+          var FUNCTION_URL = 'https://thedarkprotocol.netlify.app/.netlify/functions/send-access';
           fetch(FUNCTION_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

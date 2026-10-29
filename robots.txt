@@ -33,7 +33,7 @@ User-agent: MJ12bot
 Disallow: /
 
 # Sitemap location
-Sitemap: https://victorsg1.github.io/dark-protocol/sitemap.xml
+Sitemap: https://thedarkprotocol.netlify.app/sitemap.xml
 
 # Crawl delay (optional - 0 = no delay)
 Crawl-delay: 0

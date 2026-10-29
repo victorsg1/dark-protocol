@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>/* Single home: send GitHub Pages visitors to the Netlify site */if(location.hostname==='victorsg1.github.io'){location.replace('https://thedarkprotocol.netlify.app'+location.pathname.replace(/^\/dark-protocol/,'')+location.search+location.hash);}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout — The Dark Protocol</title>
 <meta name="robots" content="noindex, nofollow">
@@ -462,7 +463,7 @@
   // Replace YOUR_NETLIFY_SITE with your Netlify
   // app URL after deploying (e.g. https://dark-protocol.netlify.app)
   // ══════════════════════════════════════════
-  var FUNCTION_URL = 'https://earnest-cheesecake-d8a287.netlify.app/.netlify/functions/send-access';
+  var FUNCTION_URL = 'https://thedarkprotocol.netlify.app/.netlify/functions/send-access';
 
   function sendAccessEmail(orderId, plan, buyerEmail, buyerName) {
     return fetch(FUNCTION_URL, {
