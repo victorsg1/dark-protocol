@@ -286,6 +286,22 @@
     .navbar { padding: 0 16px; }
   }
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '844116555093158');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+src="https://www.facebook.com/tr?id=844116555093158&ev=PageView&noscript=1"></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -451,6 +467,21 @@
     document.querySelectorAll('.checkout-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('tab-' + plan).classList.add('active');
     document.getElementById('panel-' + plan).classList.add('active');
+    trackInitiateCheckout(plan);
+  }
+
+  // Meta Pixel — InitiateCheckout once per plan viewed on this page (same content_ids as Purchase)
+  var CHECKOUT_TRACKED = {};
+  function trackInitiateCheckout(plan) {
+    if (CHECKOUT_TRACKED[plan] || typeof fbq !== 'function') return;
+    CHECKOUT_TRACKED[plan] = true;
+    var info = plan === 'complete'
+      ? { value: 97.00, name: 'The Dark Protocol — Complete' }
+      : { value: 9.00, name: 'The Dark Protocol — Phase I' };
+    fbq('track', 'InitiateCheckout', {
+      value: info.value, currency: 'USD', content_name: info.name,
+      content_ids: [plan], content_type: 'product', num_items: 1
+    });
   }
 
   // Auto-select plan from URL: ?plan=phase1 or ?plan=complete
